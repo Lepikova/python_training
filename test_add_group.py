@@ -38,19 +38,19 @@ class TestAddGroup(unittest.TestCase):
         # return to groups page
         wd.find_element_by_link_text("groups").click()
 
-    def create_group(self, wd, Group):
+    def create_group(self, wd, party):
         # init group creation
         wd.find_element_by_name("new").click()
         # fill group form
         wd.find_element_by_name("group_name").click()
         wd.find_element_by_name("group_name").clear()
-        wd.find_element_by_name("group_name").send_keys(Group.name)
+        wd.find_element_by_name("group_name").send_keys(party.name)
         wd.find_element_by_name("group_header").click()
         wd.find_element_by_name("group_header").clear()
-        wd.find_element_by_name("group_header").send_keys(Group.header)
+        wd.find_element_by_name("group_header").send_keys(party.header)
         wd.find_element_by_name("group_footer").click()
         wd.find_element_by_name("group_footer").clear()
-        wd.find_element_by_name("group_footer").send_keys(Group.footer)
+        wd.find_element_by_name("group_footer").send_keys(party.footer)
         # submit group creation
         wd.find_element_by_name("submit").click()
 
