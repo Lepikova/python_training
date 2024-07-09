@@ -13,11 +13,8 @@ class TestAddContact(unittest.TestCase):
     
     def test_add_contact(self):
         wd = self.wd
-        self.open_home_page(wd)
         self.login(wd, "admin", "secret")
-        self.open_creating_contact(wd)
         self.creating_contact(wd, Contact(firstname="Ivan", middlename="Iva", lastname="Ivanov", nickname="Vano", title="First", address="Spb", company="Leno", homenomber="123", worknomber="12344", mobilenomber="32123", fax="321", email="1234@mail.ru", bday="20", bmonth="October", byear="1990"))
-        self.return_to_home_page(wd)
         self.logout(wd)
 
     def logout(self, wd):
@@ -29,6 +26,7 @@ class TestAddContact(unittest.TestCase):
         wd.find_element_by_link_text("home").click()
 
     def creating_contact(self, wd, contact):
+        self.open_creating_contact(wd)
         # fill contact form
         wd.find_element_by_name("firstname").click()
         wd.find_element_by_name("firstname").clear()
@@ -75,12 +73,14 @@ class TestAddContact(unittest.TestCase):
         wd.find_element_by_name("byear").send_keys(contact.byear)
         # submit contact creation
         wd.find_element_by_xpath("//div[@id='content']/form/input[20]").click()
+        self.return_to_home_page(wd)
 
     def open_creating_contact(self, wd):
         # open creating contact
         wd.find_element_by_link_text("add new").click()
 
     def login(self, wd, username, password):
+        self.open_home_page(wd)
         # login
         wd.find_element_by_name("user").clear()
         wd.find_element_by_name("user").send_keys(username)
