@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from contact import Contact
-from application_contact import Application
-
+from fixture.application import Application
 @pytest.fixture
 def app(request):
     fixture = Application()
@@ -10,6 +9,6 @@ def app(request):
     return fixture
     
 def test_add_contact(app):
-    app.login("admin", "secret")
-    app.creating_contact(Contact(firstname="Ivan", middlename="Iva", lastname="Ivanov", nickname="Vano", title="First", address="Spb", company="Leno", homenomber="123", worknomber="12344", mobilenomber="32123", fax="321", email="1234@mail.ru", bday="20", bmonth="October", byear="1990"))
-    app.logout()
+    app.session.login("admin", "secret")
+    app.contact.creating(Contact(firstname="Ivan", middlename="Iva", lastname="Ivanov", nickname="Vano", title="First", address="Spb", company="Leno", homenomber="123", worknomber="12344", mobilenomber="32123", fax="321", email="1234@mail.ru", bday="20", bmonth="October", byear="1990"))
+    app.session.logout()
