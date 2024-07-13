@@ -1,4 +1,3 @@
-import time
 class SessionHelper:
 
     def __init__(self, app):
@@ -20,4 +19,4 @@ class SessionHelper:
         wd = self.app.wd
         # logout
         wd.find_element_by_link_text("Logout").click()
-        time.sleep(1)
+        wd.find_element_by_xpath("//input[@value='Login']")
