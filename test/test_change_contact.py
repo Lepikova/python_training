@@ -1,7 +1,17 @@
 
 from model.contact import Contact
 
-def test_update_contact(app):
+def test_update_contact_firstname(app):
     app.session.login("admin", "secret")
-    app.contact.update_contact(Contact(firstname="Igor", middlename="Semen", lastname="Petrov", nickname="wqer", title="Second", address="Moscow", company="Magnit", homenomber="proton", worknomber="00000", mobilenomber="54345", fax="77777", email="1234@yandex.ru", bday="10", bmonth="November", byear="1987"))
+    app.contact.update_contact(Contact(firstname="Huan"))
+    app.session.logout()
+
+def test_update_contact_middlename(app):
+    app.session.login("admin", "secret")
+    app.contact.update_contact(Contact(middlename="Paablo"))
+    app.session.logout()
+
+def test_update_contact_lastname(app):
+    app.session.login("admin", "secret")
+    app.contact.update_contact(Contact(lastname="Петрович"))
     app.session.logout()
