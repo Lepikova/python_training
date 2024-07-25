@@ -15,6 +15,8 @@ class ContactHelper:
         # submit contact creation
         wd.find_element_by_xpath("//div[@id='content']/form/input[20]").click()
         self.app.return_to_home_page()
+        self.contact_cache = None
+
 
     def fill_contact_form(self, contact):
         self.filling_contact_write("firstname", contact.firstname)
@@ -56,6 +58,7 @@ class ContactHelper:
         # submit deletion
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         self.app.return_to_home_page()
+        self.contact_cache = None
 
     def select_first_contact(self):
         wd = self.app.wd
@@ -70,6 +73,7 @@ class ContactHelper:
         # submit contact creation
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
         self.app.return_to_home_page()
+        self.contact_cache = None
 
     def open_contact_page(self):
         wd = self.app.wd
@@ -81,19 +85,22 @@ class ContactHelper:
         self.open_contact_page()
         return len(wd.find_elements_by_xpath("//img[@alt='Edit']"))
 
+    contact_cache = None
+
     def get_contact_list(self):
-        wd = self.app.wd
-        self.open_contact_page()
-        contacts = []
-        # Поиск всех строк таблицы с контактами
-        rows = wd.find_elements_by_css_selector("tr[name='entry']")
-        for row in rows:
-            cells = row.find_elements_by_tag_name("td")
-            # Получаем ID контакта из чекбокса
-            checkbox = cells[0].find_element_by_tag_name("input")
-            id = checkbox.get_attribute("value")
-            # Имя и фамилия находятся в других ячейках
-            lastname = cells[1].text
-            firstname = cells[2].text
-            contacts.append(Contact(firstname=firstname, lastname=lastname, id=id))
-        return contacts
+        if self.contact_cache is None:
+            wd = self.app.wd
+            self.open_contact_page()
+            self.contact_cache = []
+            # Поиск всех строк таблицы с контактами
+            rows = wd.find_elements_by_css_selector("tr[name='entry']")
+            for row in rows:
+                cells = row.find_elements_by_tag_name("td")
+                # Получаем ID контакта из чекбокса
+                checkbox = cells[0].find_element_by_tag_name("input")
+                id = checkbox.get_attribute("value")
+                # Имя и фамилия находятся в других ячейках
+                lastname = cells[1].text
+                firstname = cells[2].text
+                self.contact_cache.append(Contact(firstname=firstname, lastname=lastname, id=id))
+        return list(self.contact_cache)
