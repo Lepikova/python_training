@@ -53,27 +53,46 @@ class ContactHelper:
         wd.find_element_by_link_text("add new").click()
 
     def delete_first_contact(self):
+       self.delete_contact_by_index(0)
+
+    def delete_contact_by_index(self, index):
         wd = self.app.wd
-        self.select_first_contact()
+        self.open_contact_page()
+        self.select_contact_by_index(index)
         # submit deletion
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         self.app.return_to_home_page()
         self.contact_cache = None
 
-    def select_first_contact(self):
-        wd = self.app.wd
-        self.open_contact_page()
-        wd.find_element_by_name("selected[]").click()
 
-    def update_contact(self, contact):
+    def select_first_contact(self):
+        self.select_contact_by_index(0)
+
+    def select_contact_by_index(self, index):
         wd = self.app.wd
         self.open_contact_page()
-        wd.find_element_by_xpath("//img[@alt='Edit']").click()
-        self.fill_contact_form(contact)
-        # submit contact creation
-        wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
-        self.app.return_to_home_page()
-        self.contact_cache = None
+        wd.find_elements_by_name("selected[]")[index].click()
+
+
+    def update_first_contact(self, contact):
+        self.update_contact_by_index(0, contact)
+
+    def update_contact_by_index(self, index, contact):
+        wd = self.app.wd
+        self.open_contact_page()
+        self.select_contact_by_index(index)
+        rows = wd.find_elements_by_name("entry")
+        if index < len(rows):
+            row = rows[index]
+            # Найти и нажать кнопку Edit
+            edit_button = row.find_element_by_xpath(".//a[contains(@href, 'edit.php?id=')]")
+            edit_button.click()
+            self.fill_contact_form(contact)
+            # submit contact creation
+            wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
+            self.app.return_to_home_page()
+            self.contact_cache = None
+
 
     def open_contact_page(self):
         wd = self.app.wd
