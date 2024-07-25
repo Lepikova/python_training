@@ -85,8 +85,15 @@ class ContactHelper:
         wd = self.app.wd
         self.open_contact_page()
         contacts = []
-        for element in wd.find_elements_by_css_selector("tr[name='entry']"):
-            text = element.text
-            id = element.find_element_by_name("selected[]").get_attribute("value")
-            contacts.append(Contact(firstname=text, id=id))
+        # Поиск всех строк таблицы с контактами
+        rows = wd.find_elements_by_css_selector("tr[name='entry']")
+        for row in rows:
+            cells = row.find_elements_by_tag_name("td")
+            # Получаем ID контакта из чекбокса
+            checkbox = cells[0].find_element_by_tag_name("input")
+            id = checkbox.get_attribute("value")
+            # Имя и фамилия находятся в других ячейках
+            lastname = cells[1].text
+            firstname = cells[2].text
+            contacts.append(Contact(firstname=firstname, lastname=lastname, id=id))
         return contacts
