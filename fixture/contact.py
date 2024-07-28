@@ -1,5 +1,6 @@
 from selenium.webdriver.support.ui import Select
 from model.contact import Contact
+import re
 
 
 class ContactHelper:
@@ -45,7 +46,7 @@ class ContactHelper:
         wd = self.app.wd
         if text is not None:
             wd.find_element_by_name(field_name).click()
-            wd.find_element_by_name(field_name).clear()
+            wd.find_element_by_name(field_name).clear_phone()
             wd.find_element_by_name(field_name).send_keys(text)
 
     def open_creating_contact(self):
@@ -80,19 +81,32 @@ class ContactHelper:
     def update_contact_by_index(self, index, contact):
         wd = self.app.wd
         self.open_contact_page()
+        self.open_edit_page_by_index(index)
+        self.fill_contact_form(contact)
+        # submit contact creation
+        wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
+        self.app.return_to_home_page()
+        self.contact_cache = None
+
+    def open_edit_page_by_index(self, index):
+        wd = self.app.wd
         self.select_contact_by_index(index)
         rows = wd.find_elements_by_name("entry")
         if index < len(rows):
             row = rows[index]
             # Найти и нажать кнопку Edit
-            edit_button = row.find_element_by_xpath(".//a[contains(@href, 'edit.php?id=')]")
+            edit_button = row.find_element_by_css_selector("a[href*='edit.php?id=']")
             edit_button.click()
-            self.fill_contact_form(contact)
-            # submit contact creation
-            wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
-            self.app.return_to_home_page()
-            self.contact_cache = None
 
+    def open_view_page_by_index(self, index):
+        wd = self.app.wd
+        self.select_contact_by_index(index)
+        rows = wd.find_elements_by_name("entry")
+        if index < len(rows):
+            row = rows[index]
+            # Найти и нажать кнопку Details
+            details_button = row.find_element_by_css_selector("a[href*='view.php?id=']")
+            details_button.click()
 
     def open_contact_page(self):
         wd = self.app.wd
@@ -121,5 +135,42 @@ class ContactHelper:
                 # Имя и фамилия находятся в других ячейках
                 lastname = cells[1].text
                 firstname = cells[2].text
-                self.contact_cache.append(Contact(firstname=firstname, lastname=lastname, id=id))
+                # Вычленяем телефоны
+                all_phones = cells[5].text.splitlines()
+                self.contact_cache.append(Contact(firstname=firstname, lastname=lastname, id=id,
+                                                  homenomber=all_phones[0], mobilenomber=all_phones[1],
+                                                  worknomber=all_phones[2]))
         return list(self.contact_cache)
+
+    def get_contact_info_from_edit_page(self, index):
+        wd = self.app.wd
+        self.open_edit_page_by_index(index)
+        firstname = wd.find_element_by_name('firstname').get_attribute('value')
+        lastname = wd.find_element_by_name('lastname').get_attribute('value')
+        id = wd.find_element_by_name('id').get_attribute('value')
+        homenomber = wd.find_element_by_name('home').get_attribute('value')
+        worknomber = wd.find_element_by_name('work').get_attribute('value')
+        mobilenomber = wd.find_element_by_name('mobile').get_attribute('value')
+        return Contact(firstname=firstname, lastname=lastname, id=id,
+                       homenomber=homenomber, mobilenomber=mobilenomber,
+                       worknomber=worknomber)
+
+    def get_contact_from_view_page(self, index):
+        wd = self.app.wd
+        self.open_view_page_by_index(index)
+        text = wd.find_element_by_id("content").text
+        homenomber = re.search("H: (.*)", text).group(1)
+        mobilenomber = re.search("M: (.*)", text).group(1)
+        worknomber = re.search("W: (.*)", text).group(1)
+        return Contact(homenomber=homenomber, mobilenomber=mobilenomber,
+                       worknomber=worknomber)
+
+
+
+
+
+
+
+
+
+

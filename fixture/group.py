@@ -31,7 +31,7 @@ class GroupHelper:
         wd = self.app.wd
         if text is not None:
             wd.find_element_by_name(field_name).click()
-            wd.find_element_by_name(field_name).clear()
+            wd.find_element_by_name(field_name).clear_phone()
             wd.find_element_by_name(field_name).send_keys(text)
 
     def open_group_page(self):
