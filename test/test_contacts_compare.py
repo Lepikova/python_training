@@ -1,16 +1,19 @@
 import re
 from random import randrange
 
-def tests_contactes_on_home_page(app):
-    contact_list = app.contact.get_contact_list()
-    index = randrange(len(contact_list))
-    contact_from_home_page = app.contact.get_contact_list()[index]
-    contact_from_edit_page = app.contact.get_contact_info_from_edit_page(index)
-    assert contact_from_home_page.all_phones_from_home_page == merge_phones_like_on_home_page(contact_from_edit_page)
-    assert contact_from_home_page.lastname == contact_from_edit_page.lastname.strip()
-    assert contact_from_home_page.firstname == contact_from_edit_page.firstname.strip()
-    assert contact_from_home_page.address == contact_from_edit_page.address.strip()
-    assert contact_from_home_page.all_emails_from_home_page == merge_emails_like_on_home_page(contact_from_edit_page)
+
+def test_all_contacts_on_home_page(app, db):
+    contacts_from_db = db.get_contact_list()
+    contacts_from_home_page = app.contact.get_contact_list()
+    assert len(contacts_from_home_page) == len(contacts_from_db)
+    for contact_from_home_page in contacts_from_home_page:
+        contact_from_db = next(filter(lambda x: x.id == contact_from_home_page.id, contacts_from_db))
+        assert contact_from_home_page.firstname == contact_from_db.firstname.strip()
+        assert contact_from_home_page.lastname == contact_from_db.lastname.strip()
+        assert contact_from_home_page.address == contact_from_db.address.strip()
+        assert contact_from_home_page.all_phones_from_home_page == merge_phones_like_on_home_page(contact_from_db)
+        assert contact_from_home_page.all_emails_from_home_page == merge_emails_like_on_home_page(contact_from_db)
+
 
 
 #def test_phones_on_contact_view_page(app):
