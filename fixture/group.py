@@ -52,12 +52,26 @@ class GroupHelper:
         self.group_cache = None
 
 
+    def delete_group_by_id(self, id):
+        wd = self.app.wd
+        self.open_group_page()
+        self.select_group_by_id(id)
+        # submit deletion
+        wd.find_element_by_name("delete").click()
+        self.return_to_groups_page()
+        self.group_cache = None
+
+
     def select_first_group(self):
         self.select_group_by_index(0)
 
     def select_group_by_index(self, index):
         wd = self.app.wd
         wd.find_elements_by_name("selected[]")[index].click()
+
+    def select_group_by_id(self, id):
+        wd = self.app.wd
+        wd.find_element_by_css_selector("input[value='%s']" % id).click()
 
     def update_first_group(self, upd):
         self.update_group_by_index(0)
@@ -67,6 +81,19 @@ class GroupHelper:
         wd = self.app.wd
         self.open_group_page()
         self.select_group_by_index(index)
+        wd.find_element_by_name("edit").click()
+        self.filling("group_name", upd.name)
+        self.filling("group_header", upd.header)
+        self.filling("group_footer", upd.footer)
+        # submit
+        wd.find_element_by_name("update").click()
+        self.return_to_groups_page()
+        self.group_cache = None
+
+    def update_group_by_id(self, id, upd):
+        wd = self.app.wd
+        self.open_group_page()
+        self.select_group_by_id(id)
         wd.find_element_by_name("edit").click()
         self.filling("group_name", upd.name)
         self.filling("group_header", upd.header)

@@ -24,7 +24,11 @@ for o, a in opts:
 
 def random_string(prefix, maxlen):
     symbols = string.ascii_letters + string.digits + " "*4
-    return prefix + "".join([random.choice(symbols) for i in range(random.randrange(maxlen))])
+    # Генерация строки с случайными символами
+    result = prefix + "".join([random.choice(symbols) for i in range(random.randrange(maxlen))])
+    # Удаление двойных пробелов и лишних пробелов по краям
+    return " ".join(result.split())
+
 
 
 testdata = [Group(name="", header="", footer="")] + [
